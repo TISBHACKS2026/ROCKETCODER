@@ -235,13 +235,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               color: AppColors.co2Green,
                             ),
                           ),
-                          Text(
-                            '${AppConstants.totalCO2Saved} Kg',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
-                            ),
+                          StreamBuilder<Map<String, dynamic>>(
+                            stream: _supabaseService.getGlobalStatsStream(),
+                            builder: (context, snapshot) {
+                              final co2 = snapshot.hasData
+                                  ? (snapshot.data!['total_co2_saved'] ?? 0.0).toStringAsFixed(1)
+                                  : '...';
+                                  
+                              return Text(
+                                '$co2 Kg',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textPrimary,
+                                ),
+                              );
+                            },
                           ),
                           const Text(
                             'CO2 Saved by Students',
@@ -276,6 +285,8 @@ class _AuthDialogState extends State<_AuthDialog> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String? _errorMessage;
+
 
   @override
   Widget build(BuildContext context) {
@@ -307,6 +318,15 @@ class _AuthDialogState extends State<_AuthDialog> {
               obscureText: true,
               validator: (value) => (value?.length ?? 0) < 6 ? 'Min 6 chars' : null,
             ),
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontSize: 13),
+                  textAlign: TextAlign.center,
+                ),
+              ),
           ],
         ),
       ),
@@ -316,6 +336,17 @@ class _AuthDialogState extends State<_AuthDialog> {
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryGreen, foregroundColor: Colors.black),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
+              if (!widget.isLogin) {
+                final email = _emailController.text.trim().toLowerCase();
+                if (!email.endsWith('@tisb.ac.in')) {
+                  setState(() {
+                    _errorMessage =
+                        'Please enter a valid @tisb.ac.in email address.';
+                  });
+                  return;
+                }
+              }
+              setState(() => _errorMessage = null);
               widget.onAuth(
                 _emailController.text.trim(),
                 _passwordController.text,

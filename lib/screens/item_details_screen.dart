@@ -4,6 +4,7 @@ import 'package:eco_tisb/models/user_profile.dart';
 import 'package:eco_tisb/services/supabase_service.dart';
 import 'package:eco_tisb/utils/colors.dart';
 import 'package:eco_tisb/widgets/custom_button.dart';
+import 'package:eco_tisb/widgets/report_dialog.dart';
 
 class ItemDetailsScreen extends StatefulWidget {
   final Item item;
@@ -177,23 +178,49 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
             child: Text(initial, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text("${_sellerProfile?.points ?? 0} Eco-Points", style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(displayName, 
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text("${_sellerProfile?.points ?? 0} Eco-Points", style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              ],
+            ),
           ),
-          const Spacer(),
-          Text(
-              widget.item.sellerEmail.length > 15
-                  ? "...${widget.item.sellerEmail.substring(widget.item.sellerEmail.length - 12)}"
-                  : widget.item.sellerEmail,
-              style: const TextStyle(fontSize: 10, color: AppColors.textLight)
-          ),
+          if (widget.item.sellerEmail != _supabaseService.currentUser?.email)
+            IconButton(
+              icon: const Icon(Icons.flag, color: Colors.redAccent, size: 24),
+              tooltip: 'Report User',
+              onPressed: () => _showReportDialog(context),
+            ),
         ],
       ),
     );
+  }
+
+  void _showReportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ReportDialog(
+        reportedUserEmail: widget.item.sellerEmail,
+        listingId: widget.item.id,
+        onSubmit: (reason, details) => _supabaseService.reportUser(
+          reportedUserEmail: widget.item.sellerEmail,
+          reason: reason,
+          details: details,
+          listingId: widget.item.id,
+        ),
+      ),
+    ).then((submitted) {
+      if (submitted == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Report submitted. We will investigate.')),
+        );
+      }
+    });
   }
 
   Widget _buildBottomAction() {

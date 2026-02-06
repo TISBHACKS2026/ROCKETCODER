@@ -192,13 +192,39 @@ class SupabaseService {
   }
 
   Future<Item?> createItem(Item item) async {
-    final data = item.toJson();
-    data.remove('id');
-    data.remove('created_at');
+    try {
+      final data = item.toJson();
+      data.remove('id');
+      data.remove('created_at');
 
-    final response = await _client.from('items').insert(data).select().maybeSingle();
-    if (response == null) return null;
-    return Item.fromJson(response);
+      final response = await _client.from('items').insert(data).select().maybeSingle();
+      if (response == null) return null;
+      return Item.fromJson(response);
+    } on PostgrestException catch (e) {
+      if (e.message.contains('Monthly limit')) {
+        throw Exception('Monthly limit reached: You can only post 5 items per month.');
+      } else if (e.message.contains('Spam detected')) {
+        throw Exception('Spam detected: Please remove restricted keywords (e.g., gift cards, crypto).');
+      } else if (e.message.contains('banned')) {
+        throw Exception('Access Denied: Your account has been banned due to security violations.');
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> reportUser({
+    required String reportedUserEmail,
+    required String reason,
+    String? details,
+    String? listingId,
+  }) async {
+    await _client.from('reports').insert({
+      'reporter_email': currentUser!.email!,
+      'reported_user_email': reportedUserEmail,
+      'reason': reason,
+      'details': details,
+      'listing_id': listingId,
+    });
   }
 
   // --- Lost & Found Logic ---
@@ -262,6 +288,14 @@ class SupabaseService {
       'p_items': 1,
       'p_trees': trees,
     });
+
+    // 4. Update Global Stats
+    await _client.rpc('increment_global_stats', params: {
+      'p_co2': co2,
+      'p_points': pts,
+      'p_items': 1,
+      'p_trees': trees,
+    });
   }
 
   /// Updated to reward both Finder and Owner
@@ -313,5 +347,20 @@ class SupabaseService {
       debugPrint('Error fetching user listings: $e');
       return [];
     }
+  }
+
+  // --- Global Stats (Live Counter) ---
+
+  Stream<Map<String, dynamic>> getGlobalStatsStream() {
+    return _client
+        .from('global_stats')
+        .stream(primaryKey: ['id'])
+        .eq('id', 1) // Assuming single row with ID 1
+        .map((event) => event.isNotEmpty ? event.first : {
+          'total_co2_saved': 0.0,
+          'total_points': 0,
+          'total_swaps': 0,
+          'total_trees': 0.0,
+        });
   }
 }

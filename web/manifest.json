@@ -1,6 +1,6 @@
 {
-    "name": "tisb_swap",
-    "short_name": "tisb_swap",
+    "name": "TISB Swap",
+    "short_name": "TISB Swap",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
