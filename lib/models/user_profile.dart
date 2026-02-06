@@ -3,8 +3,8 @@ class UserProfile {
   final String email;
   final int points;
   final double co2Saved;
-  final int itemsRecycled; // Add this
-  final double treesSaved;  // Add this
+  final int itemsRecycled;
+  final double treesSaved;
 
   UserProfile({
     required this.fullName,

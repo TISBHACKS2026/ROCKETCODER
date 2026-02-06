@@ -2,7 +2,7 @@ class Conversation {
   final String id;
   final String? itemId;
   final DateTime createdAt;
-  final String? otherParticipantName; // For UI display
+  final String? otherParticipantName;
 
   Conversation({
     required this.id,

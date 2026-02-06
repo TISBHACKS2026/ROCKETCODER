@@ -11,7 +11,7 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   final SupabaseService _supabaseService = SupabaseService();
-  // Index is 1 because "Chat" is the second item in your bottom bar
+
   int _currentIndex = 1;
 
   @override
@@ -118,7 +118,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           );
         },
       ),
-      // Exact same BottomNavigationBar as MarketplaceScreen
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -128,7 +128,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           if (index == 0) {
             Navigator.pushReplacementNamed(context, '/marketplace');
           } else if (index == 1) {
-            // Already here
+
           } else if (index == 2) {
             Navigator.pushReplacementNamed(context, '/profile');
           } else if (index == 3) {

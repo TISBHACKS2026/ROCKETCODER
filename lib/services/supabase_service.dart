@@ -10,7 +10,7 @@ class SupabaseService {
 
   User? get currentUser => _client.auth.currentUser;
 
-  // Impact mapping based on your schema logic
+
   final Map<String, Map<String, double>> categoryImpact = {
     'BOOK': {'co2': 10.0, 'points': 100},
     'UNIFORM': {'co2': 25.0, 'points': 150},
@@ -18,7 +18,7 @@ class SupabaseService {
     'OTHER': {'co2': 5.0, 'points': 50},
   };
 
-  // --- Authentication ---
+
 
   Future<AuthResponse> signUp({
     required String email,
@@ -61,14 +61,14 @@ class SupabaseService {
     });
   }
 
-  // --- Storage (Unified to handle item_images bucket) ---
+
 
   Future<String?> _uploadFile(File file, String folder) async {
     try {
       final fileName = '${DateTime.now().millisecondsSinceEpoch}${p.extension(file.path)}';
       final path = '$folder/$fileName';
 
-      // Ensure your bucket 'item_images' has an INSERT policy for authenticated users
+
       await _client.storage.from('item_images').upload(path, file);
       return _client.storage.from('item_images').getPublicUrl(path);
     } catch (e) {
@@ -80,13 +80,13 @@ class SupabaseService {
   Future<String?> uploadItemImage(File file) => _uploadFile(file, 'marketplace');
   Future<String?> uploadLostFoundImage(File file) => _uploadFile(file, 'lost_found');
 
-  // --- Conversations & Messaging ---
 
-  /// Handles creating a chat for both Marketplace (items) and Lost & Found (lost_found)
+
+
   Future<String> getOrCreateConversation(String itemId, String recipientEmail) async {
     final myEmail = currentUser!.email!;
 
-    // 1. Check if a conversation already exists for this item involving the current user
+
     final existingParticipants = await _client
         .from('conversation_participants')
         .select('conversation_id')
@@ -107,16 +107,16 @@ class SupabaseService {
       if (existingConv != null) return existingConv['id'];
     }
 
-    // 2. Create new conversation if none exists
-    // Note: Ensure your 'conversations' table item_id is not strictly tied
-    // to 'items.id' via a Foreign Key if using for Lost & Found too.
+
+
+
     final newConv = await _client.from('conversations').insert({
       'item_id': itemId,
     }).select().single();
 
     final String newId = newConv['id'];
 
-    // 3. Add both participants
+
     await _client.from('conversation_participants').insert([
       {'conversation_id': newId, 'user_email': myEmail},
       {'conversation_id': newId, 'user_email': recipientEmail},
@@ -141,7 +141,7 @@ class SupabaseService {
 
         final convData = await _client.from('conversations').select().eq('id', convId).single();
 
-        // Check Marketplace first, then Lost & Found for item details
+
         var itemDetails = await _client.from('items').select().eq('id', convData['item_id']).maybeSingle();
         itemDetails ??= await _client.from('lost_found').select().eq('id', convData['item_id']).maybeSingle();
 
@@ -180,7 +180,7 @@ class SupabaseService {
         .order('created_at', ascending: false);
   }
 
-  // --- Marketplace Logic ---
+
 
   Future<List<Item>> getAvailableItems() async {
     final response = await _client
@@ -227,7 +227,7 @@ class SupabaseService {
     });
   }
 
-  // --- Lost & Found Logic ---
+
 
   Future<List<Map<String, dynamic>>> getLostFoundItems(String type) async {
     final response = await _client
@@ -243,7 +243,7 @@ class SupabaseService {
     await _client.from('lost_found').insert(itemData);
   }
 
-  // --- Profile & Gamification ---
+
 
   Future<UserProfile?> getUserProfile(String email) async {
     final response = await _client.from('profiles').select().eq('email', email).maybeSingle();
@@ -252,7 +252,7 @@ class SupabaseService {
   Future<void> completeTransaction({
     required String itemId,
     required String sellerEmail,
-    required String buyerEmail, // New parameter
+    required String buyerEmail,
     required String category
   }) async {
     final impact = categoryImpact[category.toUpperCase()] ?? categoryImpact['OTHER']!;
@@ -260,7 +260,7 @@ class SupabaseService {
     final int pts = impact['points']!.toInt();
     final double trees = co2 / 22.0;
 
-    // 1. Mark item as swapped
+
     final response = await _client
         .from('items')
         .update({'is_swapped': true})
@@ -271,7 +271,7 @@ class SupabaseService {
       throw Exception("Update failed: Permission denied or item not found.");
     }
 
-    // 2. Award points to SELLER
+
     await _client.rpc('increment_user_stats', params: {
       'p_email': sellerEmail,
       'p_co2': co2,
@@ -280,7 +280,7 @@ class SupabaseService {
       'p_trees': trees,
     });
 
-    // 3. Award points to BUYER (Both get the impact!)
+
     await _client.rpc('increment_user_stats', params: {
       'p_email': buyerEmail,
       'p_co2': co2,
@@ -289,7 +289,7 @@ class SupabaseService {
       'p_trees': trees,
     });
 
-    // 4. Update Global Stats
+
     await _client.rpc('increment_global_stats', params: {
       'p_co2': co2,
       'p_points': pts,
@@ -298,13 +298,13 @@ class SupabaseService {
     });
   }
 
-  /// Updated to reward both Finder and Owner
+
   Future<void> completeLostFoundRecovery({
     required String itemId,
-    required String reporterEmail, // The person who found/posted it
-    required String ownerEmail     // The person who lost it
+    required String reporterEmail,
+    required String ownerEmail
   }) async {
-    // 1. Mark item as resolved
+
     final response = await _client
         .from('lost_found')
         .update({'is_resolved': true})
@@ -315,7 +315,7 @@ class SupabaseService {
       throw Exception("Update failed: Permission denied or item not found.");
     }
 
-    // 2. Award points to REPORTER (200 pts for helping)
+
     await _client.rpc('increment_user_stats', params: {
       'p_email': reporterEmail,
       'p_co2': 0.0,
@@ -324,7 +324,7 @@ class SupabaseService {
       'p_trees': 0.0,
     });
 
-    // 3. Award points to OWNER (100 pts for using the system to find it)
+
     await _client.rpc('increment_user_stats', params: {
       'p_email': ownerEmail,
       'p_co2': 0.0,
@@ -333,7 +333,7 @@ class SupabaseService {
       'p_trees': 0.0,
     });
   }
-  // --- User Specific Items ---
+
   Future<List<Item>> getUserListings(String email) async {
     try {
       final response = await _client
@@ -349,13 +349,13 @@ class SupabaseService {
     }
   }
 
-  // --- Global Stats (Live Counter) ---
+
 
   Stream<Map<String, dynamic>> getGlobalStatsStream() {
     return _client
         .from('global_stats')
         .stream(primaryKey: ['id'])
-        .eq('id', 1) // Assuming single row with ID 1
+        .eq('id', 1)
         .map((event) => event.isNotEmpty ? event.first : {
           'total_co2_saved': 0.0,
           'total_points': 0,

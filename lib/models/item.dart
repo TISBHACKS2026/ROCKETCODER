@@ -1,6 +1,6 @@
 class Item {
   final String id;
-  final String sellerEmail; // Changed from sellerId
+  final String sellerEmail;
   final String title;
   final String? description;
   final String? category;
@@ -11,7 +11,7 @@ class Item {
 
   Item({
     required this.id,
-    required this.sellerEmail, // Changed
+    required this.sellerEmail,
     required this.title,
     this.description,
     this.category,
@@ -24,12 +24,12 @@ class Item {
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       id: json['id'] as String,
-      // Change 'seller_id' to 'seller_email' to match your Supabase log
+
       sellerEmail: json['seller_email'] as String,
       title: json['title'] as String,
       description: json['description'],
       category: json['category'],
-      // Using fallback for safety
+
       conditionRating: json['condition_rating'] is int
           ? json['condition_rating']
           : 3,

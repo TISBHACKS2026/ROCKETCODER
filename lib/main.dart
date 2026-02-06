@@ -15,7 +15,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// #region agent log
+
 void _logDebug(String location, String message, {Map<String, dynamic>? data, String hypothesisId = ''}) {
   try {
     final logFile = File(r'd:\CODES\Flutter\Code\eco_tisb\.cursor\debug.log');
@@ -33,33 +33,33 @@ void _logDebug(String location, String message, {Map<String, dynamic>? data, Str
     // Silently fail if logging doesn't work
   }
 }
-// #endregion
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // #region agent log
+  
   _logDebug('main.dart:19', 'Starting app initialization', hypothesisId: 'A');
-  // #endregion
+  
 
-  // Load environment variables
-  // #region agent log
+
+  
   _logDebug('main.dart:24', 'Attempting to load .env file', hypothesisId: 'A');
-  // #endregion
+  
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    // #region agent log
+    
     _logDebug('main.dart:27', 'Failed to load .env file', data: {
       'error': e.toString(),
     }, hypothesisId: 'A');
-    // #endregion
+    
     debugPrint('ERROR: Failed to load .env file. Make sure .env exists in the project root.');
     debugPrint('Create a .env file with: SUPABASE_URL=your_url and SUPABASE_ANON_KEY=your_key');
     rethrow;
   }
 
-  // #region agent log
+  
   final supabaseUrl = dotenv.env['SUPABASE_URL'];
   final supabaseKey = dotenv.env['SUPABASE_ANON_KEY'];
   _logDebug('main.dart:36', 'After .env load - checking values', data: {
@@ -72,13 +72,13 @@ void main() async {
     'SUPABASE_ANON_KEY_preview': supabaseKey != null ? '${supabaseKey.substring(0, supabaseKey.length > 10 ? 10 : supabaseKey.length)}...' : 'null',
     'SUPABASE_ANON_KEY_is_placeholder': supabaseKey?.contains('YOUR_SUPABASE') ?? false,
   }, hypothesisId: 'B,C,D');
-  // #endregion
+  
 
-  // Validate environment variables
+
   if (supabaseUrl == null || supabaseUrl.isEmpty || supabaseUrl.contains('YOUR_SUPABASE_URL')) {
-    // #region agent log
+    
     _logDebug('main.dart:50', 'Invalid SUPABASE_URL', hypothesisId: 'B');
-    // #endregion
+    
     throw Exception(
         'SUPABASE_URL is not configured properly in .env file.\n'
             'Please create a .env file in the project root with:\n'
@@ -88,13 +88,13 @@ void main() async {
     );
   }
 
-  // Check for common URL mistakes
+
   if (supabaseUrl.contains('.supabase.com') && !supabaseUrl.contains('.supabase.co')) {
-    // #region agent log
+    
     _logDebug('main.dart:90', 'URL has .com instead of .co', data: {
       'url': supabaseUrl,
     }, hypothesisId: 'B');
-    // #endregion
+    
     throw Exception(
         'SUPABASE_URL appears to use .com instead of .co\n'
             'Your URL: $supabaseUrl\n'
@@ -104,9 +104,9 @@ void main() async {
   }
 
   if (supabaseKey == null || supabaseKey.isEmpty || supabaseKey.contains('YOUR_SUPABASE')) {
-    // #region agent log
+    
     _logDebug('main.dart:60', 'Invalid SUPABASE_ANON_KEY', hypothesisId: 'B');
-    // #endregion
+    
     throw Exception(
         'SUPABASE_ANON_KEY is not configured properly in .env file.\n'
             'Please create a .env file in the project root with:\n'
@@ -116,32 +116,32 @@ void main() async {
     );
   }
 
-  // Initialize Supabase
-  // #region agent log
+
+  
   _logDebug('main.dart:104', 'Before Supabase.initialize', data: {
     'url_being_used': supabaseUrl,
     'url_ends_with_co': supabaseUrl.endsWith('.supabase.co'),
     'url_ends_with_com': supabaseUrl.endsWith('.supabase.com'),
   }, hypothesisId: 'D');
-  // #endregion
+  
   try {
     await Supabase.initialize(
       url: supabaseUrl,
       anonKey: supabaseKey,
     );
 
-    // #region agent log
+    
     _logDebug('main.dart:79', 'After Supabase.initialize', data: {
       'client_initialized': true,
       'client_auth_available': true,
     }, hypothesisId: 'D,E');
-    // #endregion
+    
   } catch (e) {
-    // #region agent log
+    
     _logDebug('main.dart:86', 'Supabase.initialize failed', data: {
       'error': e.toString(),
     }, hypothesisId: 'D');
-    // #endregion
+    
     debugPrint('ERROR: Failed to initialize Supabase: $e');
     debugPrint('Please verify your SUPABASE_URL and SUPABASE_ANON_KEY are correct in .env');
     rethrow;
@@ -183,7 +183,7 @@ class EcoTISBApp extends StatelessWidget {
       routes: {
         '/': (context) => const WelcomeScreen(),
         '/marketplace': (context) => const MarketplaceScreen(),
-        //'/item-details': (context) => const ItemDetailsScreen(),
+
         '/list-item': (context) => const ListItemScreen(),
         '/chat': (context) => const ChatScreen(),
         '/chat-list': (context) => const ChatListScreen(),
