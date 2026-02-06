@@ -16,7 +16,6 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if the current user is the one who reported this item
     final bool isMyReport = widget.item['reporter_email'] == _supabaseService.currentUser?.email;
 
     return Scaffold(
@@ -37,7 +36,6 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
             if (widget.item['image_url'] != null)
               Image.network(
                 widget.item['image_url'],
@@ -56,7 +54,6 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title and Type Tag
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -85,7 +82,6 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Location Row
                   Row(
                     children: [
                       const Icon(Icons.location_on, color: AppColors.primaryGreen, size: 20),
@@ -98,7 +94,6 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
                   ),
                   const Divider(height: 40),
 
-                  // Description
                   const Text(
                     'Description',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -110,17 +105,14 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Main Action Button
                   SizedBox(
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
                       onPressed: _isProcessing ? null : () async {
                         if (isMyReport) {
-                          // ACTION FOR THE REPORTER: Mark as resolved in DB
                           await _handleResolve();
                         } else {
-                          // ACTION FOR THE VIEWER: Start/Go to chat
                           await _handleContact();
                         }
                       },
@@ -155,18 +147,16 @@ class _LostFoundDetailsScreenState extends State<LostFoundDetailsScreen> {
   Future<void> _handleResolve() async {
     setState(() => _isProcessing = true);
     try {
-      // Calls completeLostFoundRecovery to update is_resolved = true and award points
       await _supabaseService.completeLostFoundRecovery(
         itemId: widget.item['id'],
         reporterEmail: widget.item['reporter_email'],
-        ownerEmail: _supabaseService.currentUser?.email ?? '', // Adding the missing ownerEmail
+        ownerEmail: _supabaseService.currentUser?.email ?? '', 
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Item marked as resolved! Points awarded.')),
         );
-        // Pop with 'true' to tell the previous screen to refresh the list
         Navigator.pop(context, true);
       }
     } catch (e) {

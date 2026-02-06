@@ -20,8 +20,6 @@ class _ReportItemScreenState extends State<ReportItemScreen> {
 
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
-
-  // Hardcoded to 'found' per your new single-section requirement
   final String _selectedType = 'found';
   bool _isLoading = false;
 
@@ -100,7 +98,6 @@ class _ReportItemScreenState extends State<ReportItemScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Instructional Banner
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(

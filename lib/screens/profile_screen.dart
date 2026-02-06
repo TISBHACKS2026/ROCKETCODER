@@ -30,7 +30,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = _supabaseService.currentUser;
     if (user != null && user.email != null) {
       try {
-        // Fetch profile using email as the unique identifier
         final profile = await _supabaseService.getUserProfile(user.email!);
         final listings = await _supabaseService.getUserListings(user.email!);
 
@@ -58,7 +57,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
-    // Default values if profile fetch fails
     final profileData = _profile ?? UserProfile(
       fullName: 'User',
       email: _supabaseService.currentUser?.email ?? 'Student',
@@ -164,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 16),
         CircularProgress(
           value: profile.points,
-          maxValue: 2500, // Customize based on your gamification levels
+          maxValue: 2500,
           label: 'Points',
         ),
       ],
@@ -202,7 +200,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildImpactStats(UserProfile profile) {
-    // Math: 1 tree saved for every 22kg of CO2
     final double treesSaved = profile.co2Saved / 22.0;
 
     return Padding(
@@ -257,7 +254,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         else
           ..._listings.map((item) => _buildListingTile(context, item)),
 
-        // Add Item Button
         Padding(
           padding: const EdgeInsets.all(24),
           child: CustomButton(

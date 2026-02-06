@@ -30,7 +30,6 @@ void _logDebug(String location, String message, {Map<String, dynamic>? data, Str
     };
     logFile.writeAsStringSync('${jsonEncode(logEntry)}\n', mode: FileMode.append);
   } catch (e) {
-    // Silently fail if logging doesn't work
   }
 }
 

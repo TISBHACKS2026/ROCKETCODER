@@ -15,7 +15,7 @@ class MarketplaceScreen extends StatefulWidget {
 
 class _MarketplaceScreenState extends State<MarketplaceScreen> {
   final SupabaseService _supabaseService = SupabaseService();
-  int _currentIndex = 0; // Controls the active tab in BottomNavBar
+  int _currentIndex = 0;
   String _selectedCategory = 'All Items';
   final TextEditingController _searchController = TextEditingController();
   List<Item> _items = [];
@@ -72,7 +72,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // --- UPDATED HEADER WITH LOGO ---
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -81,12 +80,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     padding: const EdgeInsets.all(6),
                     child: Image.asset(
                       'assets/images/logo-nobg.png',
-                      height: 40, // Scaled for the header
+                      height: 40,
                     ),
                   ),
                   const SizedBox(width: 12),
                   const Text(
-                    'TISB Market', // Updated name
+                    'TISB Market',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -97,7 +96,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
               ),
             ),
 
-            // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
@@ -146,7 +144,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Category Filters
             SizedBox(
               height: 40,
               child: ListView(
@@ -165,7 +162,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Items Grid
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen))
@@ -208,8 +204,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           ],
         ),
       ),
-
-      // Floating Action Button
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.pushNamed(context, '/list-item'),
         backgroundColor: AppColors.primaryGreen,
@@ -218,7 +212,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         label: const Text('Sell Item', style: TextStyle(fontWeight: FontWeight.w600)),
       ),
 
-      // --- RESTORED BOTTOM NAVIGATION BAR ---
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {

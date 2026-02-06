@@ -28,11 +28,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             await _supabaseService.signIn(email: email, password: password);
             if (!mounted) return;
 
-            Navigator.pop(context); // Close dialog
+            Navigator.pop(context);
             Navigator.pushReplacementNamed(context, '/marketplace');
           } on AuthException catch (e) {
             if (!mounted) return;
-            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(e.message), backgroundColor: Colors.red),
             );
@@ -101,17 +101,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // --- APP LOGO HEADER ---
               Container(
                 padding: const EdgeInsets.all(12),
                 child: Image.asset(
                   'assets/images/logo-nobg.png',
-                  height: 120, // Increased size for better brand presence
+                  height: 120, 
                   fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 16),
-              // Hero Image / Card
               Container(
                 height: 180,
                 width: double.infinity,
@@ -200,7 +198,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Impact Counter
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(

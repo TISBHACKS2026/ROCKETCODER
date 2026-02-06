@@ -13,7 +13,6 @@ class LostFoundScreen extends StatefulWidget {
 
 class _LostFoundScreenState extends State<LostFoundScreen> {
   final SupabaseService _supabaseService = SupabaseService();
-  // Set default type to 'found' as we are only tracking found items now
   final String _selectedType = 'found';
   bool _isLoading = true;
   List<Map<String, dynamic>> _items = [];
@@ -28,7 +27,6 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      // Fetches items where type is 'found' and is_resolved is false
       final data = await _supabaseService.getLostFoundItems(_selectedType);
       if (mounted) {
         setState(() {
@@ -61,7 +59,6 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
       ),
       body: Column(
         children: [
-          // Informational Header instead of Toggle
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -103,7 +100,6 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          // Navigates to the report screen
           final result = await Navigator.pushNamed(context, '/report-item');
           if (result == true) {
             _fetchItems();

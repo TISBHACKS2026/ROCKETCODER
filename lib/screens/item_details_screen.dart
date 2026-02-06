@@ -79,7 +79,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                     children: [
                       _buildBadge(widget.item.category ?? 'General', Colors.blueGrey),
                       const SizedBox(width: 8),
-                      // Check for Grade info in description
                       if (widget.item.description?.contains('Grade:') ?? false)
                         _buildBadge(
                             widget.item.description!.split('Grade:')[1].split('|')[0].trim(),
@@ -127,7 +126,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
   }
 
   Widget _buildImpactCard() {
-    // Dynamically get impact from our service mapping
     final impactData = _supabaseService.categoryImpact[widget.item.category?.toUpperCase()] ??
         _supabaseService.categoryImpact['OTHER']!;
 
@@ -235,7 +233,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       child: CustomButton(
         text: isMyItem ? "MARK AS SWAPPED" : "I'M INTERESTED",
         onPressed: isMyItem ? () async {
-          // Show a confirmation dialog
           bool? confirm = await showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -253,12 +250,12 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
               await _supabaseService.completeTransaction(
                 itemId: widget.item.id,
                 sellerEmail: widget.item.sellerEmail,
-                buyerEmail: _supabaseService.currentUser?.email ?? '', // The current user is the buyer
+                buyerEmail: _supabaseService.currentUser?.email ?? '', 
                 category: widget.item.category ?? 'OTHER',
               );
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Item Swapped! Points Awarded.")));
-                Navigator.pop(context, true); // Pop back and trigger refresh
+                Navigator.pop(context, true);
               }
             } catch (e) {
               debugPrint("Swap Error: $e");
@@ -279,9 +276,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                     'conversation_id': convId,
                     'seller': widget.item.sellerEmail,
                     'title': widget.item.title,
-                    'item_id': widget.item.id, // Fixed: use widget.item.id
-                    'category': widget.item.category ?? 'OTHER', // Fixed: use widget.item.category
-                    'is_lost_found': false, // Specifically for Marketplace
+                    'item_id': widget.item.id, 
+                    'category': widget.item.category ?? 'OTHER',
+                    'is_lost_found': false, 
                   }
               );
             }

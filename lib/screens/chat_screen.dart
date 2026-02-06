@@ -53,14 +53,14 @@ class _ChatScreenState extends State<ChatScreen> {
         if (isLostFound) {
           await _supabaseService.completeLostFoundRecovery(
             itemId: itemId,
-            reporterEmail: sellerEmail, // The person who reported it
-            ownerEmail: myEmail,        // You (the person claiming it)
+            reporterEmail: sellerEmail, 
+            ownerEmail: myEmail,       
           );
         } else {
           await _supabaseService.completeTransaction(
             itemId: itemId,
-            sellerEmail: sellerEmail,   // The seller
-            buyerEmail: myEmail,        // You (the buyer)
+            sellerEmail: sellerEmail,  
+            buyerEmail: myEmail,    
             category: category,
           );
         }
@@ -69,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Action Confirmed! Eco-Points added to your profile.')),
           );
-          Navigator.pop(context); // Go back to messages list
+          Navigator.pop(context);
         }
       } catch (e) {
         if (mounted) {
@@ -87,8 +87,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final String convId = args['conversation_id'];
     final String title = args['title'] ?? 'Listing';
     final String seller = args['seller'] ?? 'User';
-
-    // Extracting these for the Swap button
     final String itemId = args['item_id'] ?? '';
     final String category = args['category'] ?? 'OTHER';
     final bool isLostFound = args['is_lost_found'] ?? false;
@@ -120,7 +118,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Safe Swap Zone Banner
           Container(
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
@@ -172,8 +169,6 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-
-          // Input Bar with Swap Button
           _buildInputBar(convId, itemId, seller, category, isLostFound),
         ],
       ),

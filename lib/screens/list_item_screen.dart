@@ -32,8 +32,7 @@ class _ListItemScreenState extends State<ListItemScreen> {
     _descriptionController.dispose();
     super.dispose();
   }
-
-  // Maps UI strings to the integer rating expected by your Item model
+  
   int _getConditionRating(String condition) {
     switch (condition) {
       case 'New': return 5;
@@ -47,7 +46,8 @@ class _ListItemScreenState extends State<ListItemScreen> {
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 70, // Compresses image to save storage space
+      imageQuality: 70,
+      
     );
 
     if (pickedFile != null) {
@@ -68,7 +68,7 @@ class _ListItemScreenState extends State<ListItemScreen> {
     setState(() => _isLoading = true);
 
     try {
-      String? uploadedUrl; // Use a unique name here
+      String? uploadedUrl; 
 
       if (_selectedImage != null) {
         uploadedUrl = await _supabaseService.uploadItemImage(_selectedImage!);
@@ -83,7 +83,6 @@ class _ListItemScreenState extends State<ListItemScreen> {
             : 'Grade: $_selectedGrade | ${_descriptionController.text.trim()}',
         category: _selectedCategory,
         conditionRating: _getConditionRating(_selectedCondition),
-        // Use the 'uploadedUrl' variable we just set
         imageUrl: uploadedUrl ?? 'https://via.placeholder.com/150',
         isSwapped: false,
         createdAt: DateTime.now(),
@@ -157,7 +156,6 @@ class _ListItemScreenState extends State<ListItemScreen> {
     );
   }
 
-  // --- Helper Widgets ---
 
   Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1}) {
     return Column(
